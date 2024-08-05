@@ -1,9 +1,13 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import InputBox from "./InputBox";
 import Keyboard from "./Keyboard";
 
 export function Termo() {
   const str = "ilelo";
+  const [isCorrect, setIsCorrect] = useState(
+    Array.from({ length: 7 }, () => null)
+  );
+  const [oneCorrect, setOneCorrect] = useState(false);
   const letters = str.replace(/[^a-z]/gi, "").length;
   const boxes = Array.from({ length: letters }, (_, index) => index);
   const [activeBox, setActiveBox] = useState(0);
@@ -33,10 +37,35 @@ export function Termo() {
     });
   };
 
+  const handleCorrectRow = (rowIndex) => {
+    setIsCorrect((prevIsCorrect) => {
+      const newIsCorrect = [...prevIsCorrect];
+      newIsCorrect[rowIndex] = `input-${rowIndex}-${values[rowIndex].indexOf(
+        str
+      )}`;
+      return newIsCorrect;
+    });
+  };
+
   const handleSubmit = () => {
     setActualEnabled((prev) => (prev + 1) % 7);
 
-    // Adiciona a linha atual aos usados
+    const currentRowValues = values[actualEnabled] || [];
+    const currentRowText = currentRowValues.join("").toLowerCase();
+
+    if (currentRowText === str) {
+      handleCorrectRow(actualEnabled);
+      alert('A linha corresponde a "ilelo"!');
+      setOneCorrect(true);
+    } else {
+      setIsCorrect((prevIsCorrect) => {
+        const newIsCorrect = [...prevIsCorrect];
+        newIsCorrect[actualEnabled] = false;
+        return newIsCorrect;
+      });
+      alert('A linha não corresponde a "ilelo"!');
+    }
+
     setUsedRows((prevUsedRows) => new Set(prevUsedRows).add(actualEnabled));
   };
 
@@ -57,13 +86,16 @@ export function Termo() {
             key={rowIndex}
             rowIndex={rowIndex}
             boxes={boxes}
-            values={values[rowIndex]}
+            values={values}
             setValues={setValues}
             inputRefs={inputRefs}
             activeBox={activeBox}
             setActiveBox={setActiveBox}
             actualEnabled={actualEnabled}
             usedRows={usedRows}
+            isCorrect={isCorrect[rowIndex]}
+            handleCorrectRow={handleCorrectRow}
+            oneCorrect={oneCorrect}
           />
         ))}
       </div>
