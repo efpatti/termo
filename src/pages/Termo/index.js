@@ -1,13 +1,24 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import InputBox from "./InputBox";
 import Keyboard from "./Keyboard";
+import { Word } from "@andsfonseca/palavras-pt-br";
 
 export function Termo() {
-  const str = "termo";
+  const [randomWord, setRandomWord] = useState("");
+
+  useEffect(() => {
+    // Gerar palavra aleatória apenas no cliente
+    if (typeof window !== "undefined") {
+      const randomWord = Word.getRandomWord(5); // Obtém palavra aleatória com 5 letras
+      setRandomWord(randomWord);
+    }
+  }, []);
+  const str = randomWord;
   const [isCorrect, setIsCorrect] = useState(
     Array.from({ length: 7 }, () => null)
   );
   const [oneCorrect, setOneCorrect] = useState(false);
+  const [strRepeatLetters, setStrRepeatLetters] = useState(false);
   const letters = str.replace(/[^a-z]/gi, "").length;
   const boxes = Array.from({ length: letters }, (_, index) => index);
   const [activeBox, setActiveBox] = useState(0);
@@ -16,9 +27,27 @@ export function Termo() {
     Array.from({ length: 7 }, () => Array(letters).fill(""))
   );
   const [usedRows, setUsedRows] = useState(new Set());
-  const [matchedLetters, setMatchedLetters] = useState([]); // Estado para armazenar as letras que coincidem com str
-  const [matchedPositions, setMatchedPositions] = useState([]); // Estado para armazenar as letras e suas posições corretas
+  const [matchedLetters, setMatchedLetters] = useState([]);
+  const [matchedPositions, setMatchedPositions] = useState([]);
   const inputRefs = useRef([]);
+
+  // Verificar se a string contém letras repetidas
+  const checkForRepeatedLetters = () => {
+    const seen = new Set();
+    for (let char of str.toLowerCase()) {
+      if (seen.has(char)) {
+        setStrRepeatLetters(true);
+        return;
+      }
+      seen.add(char);
+    }
+    setStrRepeatLetters(false);
+  };
+
+  // Inicializar verificação de letras repetidas
+  useState(() => {
+    checkForRepeatedLetters();
+  }, []);
 
   const handleAlphabetClick = (letter) => (row) => {
     setValues((prevValues) => {
@@ -65,15 +94,14 @@ export function Termo() {
     setMatchedLetters(matchedLetters);
 
     // Gerar array com as letras e suas posições corretas em relação a str
-    const positions = str.split("").map((letter, index) => ({
-      letter,
-      position: index,
-    }));
+    const positions = str
+      .split("")
+      .map((letter, index) => ({ letter, position: index }));
     setMatchedPositions(positions);
 
     if (currentRowText === str) {
       handleCorrectRow(actualEnabled);
-      alert('A linha corresponde a "ilelo"!');
+      alert('A linha corresponde a "termo"!');
       setOneCorrect(true);
     } else {
       if (containsLetter) {
@@ -89,7 +117,7 @@ export function Termo() {
           newIsCorrect[actualEnabled] = false;
           return newIsCorrect;
         });
-        alert('A linha não corresponde a "ilelo"!');
+        alert('A linha não corresponde a "termo"!');
       }
     }
 
@@ -126,10 +154,11 @@ export function Termo() {
             matchedLetters={matchedLetters}
             matchedPositions={matchedPositions}
             str={str}
+            strRepeatLetters={strRepeatLetters}
           />
         ))}
       </div>
-      <div className="text-xl mt-6 space-y-2 wA-full">
+      <div className="text-xl mt-6 space-y-2 w-full">
         <Keyboard
           layout={extendedQwertyLayout}
           handleBackspace={(row) => {

@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 
 const InputBox = ({
-  str,
   rowIndex,
   boxes,
   values,
@@ -14,7 +13,8 @@ const InputBox = ({
   isCorrect,
   handleCorrectRow,
   oneCorrect,
-  matchedPositions, // Estado com as letras e posições corretas
+  matchedPositions,
+  strRepeatLetters,
 }) => {
   const isUsedRow = usedRows.has(rowIndex);
   const isActiveRow = actualEnabled === rowIndex;
@@ -154,19 +154,29 @@ const InputBox = ({
                 : isUsedRow
                 ? isCorrect
                   ? "bg-green-500"
-                  : matchedPositions.some((pos) => {
+                  : !strRepeatLetters
+                  ? matchedPositions.some((pos) => {
                       const letter = values[rowIndex][box].toLowerCase();
                       return pos.position !== box && pos.letter === letter;
                     })
-                  ? "bg-yellow-300"
-                  : "bg-teal-950"
+                    ? "bg-yellow-300"
+                    : matchedPositions.some((pos) => {
+                        const letter = values[rowIndex][box].toLowerCase();
+                        return (
+                          pos.position !== box &&
+                          pos.letter === letter &&
+                          values[rowIndex][pos.position].toLowerCase() ===
+                            letter
+                        );
+                      }) && "bg-yellow-300"
+                  : "bg-emerald-950"
                 : "bg-emerald-900 opacity-25 brightness-50"
             } ${
               oneCorrect &&
               !isCorrect &&
               isActiveRow &&
               "bg-emerald-900 opacity-25 brightness-50"
-            } text-center w-16 h-16 text-white flex items-center justify-center rounded-lg mb-1 transition-transform duration-300 caret-transparent ease-in-out cursor-pointer ${
+            }  text-center w-16 h-16 text-white flex items-center justify-center rounded-lg mb-1 transition-transform duration-300 caret-transparent ease-in-out cursor-pointer ${
               !oneCorrect && isActiveRow && activeBox === box
                 ? "border-b-8"
                 : ""
