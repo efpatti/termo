@@ -16,6 +16,8 @@ export function Termo() {
     Array.from({ length: 7 }, () => Array(letters).fill(""))
   );
   const [usedRows, setUsedRows] = useState(new Set());
+  const [matchedLetters, setMatchedLetters] = useState([]); // Estado para armazenar as letras que coincidem com str
+  const [matchedPositions, setMatchedPositions] = useState([]); // Estado para armazenar as letras e suas posições corretas
   const inputRefs = useRef([]);
 
   const handleAlphabetClick = (letter) => (row) => {
@@ -55,6 +57,20 @@ export function Termo() {
     const containsLetter = str
       .split("")
       .some((letter) => currentRowText.includes(letter));
+
+    // Gerar array com as letras que coincidem com str
+    const matchedLetters = str
+      .split("")
+      .filter((letter) => currentRowText.includes(letter));
+    setMatchedLetters(matchedLetters);
+
+    // Gerar array com as letras e suas posições corretas em relação a str
+    const positions = str.split("").map((letter, index) => ({
+      letter,
+      position: index,
+    }));
+    setMatchedPositions(positions);
+
     if (currentRowText === str) {
       handleCorrectRow(actualEnabled);
       alert('A linha corresponde a "ilelo"!');
@@ -107,10 +123,13 @@ export function Termo() {
             isCorrect={isCorrect[rowIndex]}
             handleCorrectRow={handleCorrectRow}
             oneCorrect={oneCorrect}
+            matchedLetters={matchedLetters}
+            matchedPositions={matchedPositions}
+            str={str}
           />
         ))}
       </div>
-      <div className="text-xl mt-6 space-y-2 w-full">
+      <div className="text-xl mt-6 space-y-2 wA-full">
         <Keyboard
           layout={extendedQwertyLayout}
           handleBackspace={(row) => {

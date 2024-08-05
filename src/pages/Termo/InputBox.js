@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 
 const InputBox = ({
+  str,
   rowIndex,
   boxes,
   values,
@@ -13,6 +14,7 @@ const InputBox = ({
   isCorrect,
   handleCorrectRow,
   oneCorrect,
+  matchedPositions, // Estado com as letras e posições corretas
 }) => {
   const isUsedRow = usedRows.has(rowIndex);
   const isActiveRow = actualEnabled === rowIndex;
@@ -31,7 +33,7 @@ const InputBox = ({
 
   const handleKeyDown = (event) => {
     const { key } = event;
-    const index = boxes.find((box) => box === activeBox);
+    const index = boxes.findIndex((box) => box === activeBox);
 
     if (key === "ArrowRight") {
       event.preventDefault();
@@ -151,7 +153,16 @@ const InputBox = ({
                 ? "bg-emerald-600"
                 : isUsedRow
                 ? isCorrect
-                  ? "bg-green-700"
+                  ? "bg-green-500"
+                  : matchedPositions.some((pos) => {
+                      const letter = values[rowIndex][box].toLowerCase();
+                      return (
+                        pos.position !== box &&
+                        pos.letter === letter &&
+                        values[rowIndex][pos.position].toLowerCase() === letter
+                      );
+                    })
+                  ? "bg-yellow-300"
                   : "bg-teal-950"
                 : "bg-emerald-900 opacity-25 brightness-50"
             } ${
@@ -163,7 +174,16 @@ const InputBox = ({
               !oneCorrect && isActiveRow && activeBox === box
                 ? "border-b-8"
                 : ""
-            } outline-0 border-2 active:shadow-lg`}
+            } outline-0 border-2 active:shadow-lg ${
+              !isActiveRow &&
+              matchedPositions.some(
+                (pos) =>
+                  pos.position === box &&
+                  pos.letter === values[rowIndex][box].toLowerCase()
+              )
+                ? "bg-green-500"
+                : ""
+            }`}
           />
         ))}
       </div>
