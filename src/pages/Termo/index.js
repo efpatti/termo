@@ -52,18 +52,29 @@ export function Termo() {
 
     const currentRowValues = values[actualEnabled] || [];
     const currentRowText = currentRowValues.join("").toLowerCase();
-
+    const containsLetter = str
+      .split("")
+      .some((letter) => currentRowText.includes(letter));
     if (currentRowText === str) {
       handleCorrectRow(actualEnabled);
       alert('A linha corresponde a "ilelo"!');
       setOneCorrect(true);
     } else {
-      setIsCorrect((prevIsCorrect) => {
-        const newIsCorrect = [...prevIsCorrect];
-        newIsCorrect[actualEnabled] = false;
-        return newIsCorrect;
-      });
-      alert('A linha não corresponde a "ilelo"!');
+      if (containsLetter) {
+        alert(`A linha contém alguma letra de "${str}"!`);
+        setIsCorrect((prevIsCorrect) => {
+          const newIsCorrect = [...prevIsCorrect];
+          newIsCorrect[actualEnabled] = false;
+          return newIsCorrect;
+        });
+      } else {
+        setIsCorrect((prevIsCorrect) => {
+          const newIsCorrect = [...prevIsCorrect];
+          newIsCorrect[actualEnabled] = false;
+          return newIsCorrect;
+        });
+        alert('A linha não corresponde a "ilelo"!');
+      }
     }
 
     setUsedRows((prevUsedRows) => new Set(prevUsedRows).add(actualEnabled));

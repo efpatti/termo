@@ -157,6 +157,7 @@ const InputBox = ({
             } ${
               oneCorrect &&
               !isCorrect &&
+              isActiveRow &&
               "bg-emerald-900 opacity-25 brightness-50"
             } text-center w-16 h-16 text-white flex items-center justify-center rounded-lg mb-1 transition-transform duration-300 caret-transparent ease-in-out cursor-pointer ${
               !oneCorrect && isActiveRow && activeBox === box
