@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const InputBox = ({
   rowIndex,
@@ -14,21 +14,25 @@ const InputBox = ({
   handleCorrectRow,
   oneCorrect,
   matchedPositions,
-  strRepeatLetters,
+  str,
+  strNormal,
 }) => {
   const isUsedRow = usedRows.has(rowIndex);
   const isActiveRow = actualEnabled === rowIndex;
+  const [currentDisplay, setCurrentDisplay] = useState(values[rowIndex]);
 
   const generateId = (rowIndex, boxIndex) => `input-${rowIndex}-${boxIndex}`;
 
   const handleChange = (index, event) => {
-    const newValue = event.target.value;
+    const newValue = event.target.value.toUpperCase();
 
     setValues((prevValues) => {
       const newValues = [...prevValues];
       newValues[rowIndex][index] = newValue;
       return newValues;
     });
+
+    setCurrentDisplay(newValues[rowIndex]);
   };
 
   const handleKeyDown = (event) => {
@@ -46,7 +50,7 @@ const InputBox = ({
       handleBackspace();
     } else if (key.length === 1 && /[a-zA-Z]/.test(key)) {
       event.preventDefault();
-      handleAlphabetClick(key);
+      handleAlphabetClick(key.toUpperCase());
     }
   };
 
@@ -92,6 +96,8 @@ const InputBox = ({
 
       return newValues;
     });
+
+    setCurrentDisplay(values[rowIndex]);
   };
 
   const handleAlphabetClick = (letter) => {
@@ -113,15 +119,28 @@ const InputBox = ({
 
       return newValues;
     });
+
+    setCurrentDisplay(values[rowIndex]);
+  };
+
+  // Determine a cor do fundo com base na letra e sua posição
+  const getBackgroundColor = (boxIndex) => {
+    const currentLetter = values[rowIndex][boxIndex].toLowerCase();
+    const correctPosition = matchedPositions.find(
+      (pos) => pos.position === boxIndex && pos.letter === currentLetter
+    );
+
+    if (correctPosition) {
+      return "bg-green-500"; // letra correta na posição correta
+    } else if (matchedPositions.some((pos) => pos.letter === currentLetter)) {
+      return "bg-yellow-300"; // letra correta na posição errada
+    } else {
+      return "bg-emerald-900 opacity-25 brightness-50"; // letra incorreta
+    }
   };
 
   useEffect(() => {
-    if (
-      isCorrect ===
-      `input-${rowIndex}-${boxes.find(
-        (box) => values[rowIndex][box] === "ilelo"
-      )}`
-    ) {
+    if (isCorrect === `input-${rowIndex}-${str}`) {
       handleCorrectRow(rowIndex);
     }
   }, [values]);
@@ -135,7 +154,7 @@ const InputBox = ({
   return (
     <div>
       <div className="flex justify-center gap-1">
-        {boxes.map((box) => (
+        {boxes.map((box, index) => (
           <input
             key={`${rowIndex}-${box}`}
             id={generateId(rowIndex, box)}
@@ -143,7 +162,9 @@ const InputBox = ({
             ref={(el) => (inputRefs.current[box] = el)}
             type="text"
             maxLength={1}
-            value={values[rowIndex][box]}
+            value={
+              isCorrect ? strNormal.charAt(index) : currentDisplay[box] || ""
+            }
             onChange={(event) => handleChange(box, event)}
             onClick={() => setActiveBox(box)}
             onKeyDown={handleKeyDown}
@@ -152,44 +173,18 @@ const InputBox = ({
               isActiveRow
                 ? "bg-emerald-600"
                 : isUsedRow
-                ? isCorrect
-                  ? "bg-green-500"
-                  : !strRepeatLetters
-                  ? matchedPositions.some((pos) => {
-                      const letter = values[rowIndex][box].toLowerCase();
-                      return pos.position !== box && pos.letter === letter;
-                    })
-                    ? "bg-yellow-300"
-                    : matchedPositions.some((pos) => {
-                        const letter = values[rowIndex][box].toLowerCase();
-                        return (
-                          pos.position !== box &&
-                          pos.letter === letter &&
-                          values[rowIndex][pos.position].toLowerCase() ===
-                            letter
-                        );
-                      }) && "bg-yellow-300"
-                  : "bg-emerald-950"
+                ? getBackgroundColor(box)
                 : "bg-emerald-900 opacity-25 brightness-50"
             } ${
               oneCorrect &&
               !isCorrect &&
               isActiveRow &&
               "bg-emerald-900 opacity-25 brightness-50"
-            }  text-center w-16 h-16 text-white flex items-center justify-center rounded-lg mb-1 transition-transform duration-300 caret-transparent ease-in-out cursor-pointer ${
+            } text-center w-16 h-16 text-white flex items-center justify-center rounded-lg mb-1 transition-transform duration-300 caret-transparent ease-in-out cursor-pointer ${
               !oneCorrect && isActiveRow && activeBox === box
                 ? "border-b-8"
                 : ""
-            } outline-0 border-2 active:shadow-lg ${
-              !isActiveRow &&
-              matchedPositions.some(
-                (pos) =>
-                  pos.position === box &&
-                  pos.letter === values[rowIndex][box].toLowerCase()
-              )
-                ? "bg-green-500"
-                : ""
-            }`}
+            } outline-0 border-2 active:shadow-lg`}
           />
         ))}
       </div>
