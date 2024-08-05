@@ -3,7 +3,7 @@ import InputBox from "./InputBox";
 import Keyboard from "./Keyboard";
 
 export function Termo() {
-  const str = "ilelo";
+  const str = "termo";
   const [isCorrect, setIsCorrect] = useState(
     Array.from({ length: 7 }, () => null)
   );

@@ -156,11 +156,7 @@ const InputBox = ({
                   ? "bg-green-500"
                   : matchedPositions.some((pos) => {
                       const letter = values[rowIndex][box].toLowerCase();
-                      return (
-                        pos.position !== box &&
-                        pos.letter === letter &&
-                        values[rowIndex][pos.position].toLowerCase() === letter
-                      );
+                      return pos.position !== box && pos.letter === letter;
                     })
                   ? "bg-yellow-300"
                   : "bg-teal-950"
