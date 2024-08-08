@@ -6,18 +6,17 @@ import { Word } from "@andsfonseca/palavras-pt-br";
 export function Termo() {
   const [randomWord, setRandomWord] = useState("");
   const [normalWord, setNormalWord] = useState("");
-  const [defaultValue, setDefaultValue] = useState("");
+  const [lettersWord, setLettersWord] = useState([]);
 
   useEffect(() => {
-    // Gerar palavra aleatória apenas no cliente
     if (typeof window !== "undefined") {
       const randomWord = Word.getRandomWord(5); // Obtém palavra aleatória com 5 letras
       const normalWord = randomWord
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "");
       setNormalWord(randomWord);
+      setLettersWord(normalWord.split(""));
       setRandomWord(normalWord);
-      setDefaultValue(randomWord); // Definir a versão original com acentos como defaultValue inicial
     }
   }, []);
 
@@ -89,7 +88,6 @@ export function Termo() {
       return newIsCorrect;
     });
   };
-
   const handleSubmit = () => {
     setActualEnabled((prev) => (prev + 1) % 7);
 
@@ -115,7 +113,6 @@ export function Termo() {
       handleCorrectRow(actualEnabled);
       alert('A linha corresponde a "termo"!');
       setOneCorrect(true);
-      setDefaultValue(strNormal); // Definir a versão original com acentos como defaultValue após acerto
     } else {
       // Identificar letras incorretas na linha
       const incorrect = str
@@ -182,6 +179,7 @@ export function Termo() {
             strNormal={strNormal}
             strRepeatLetters={strRepeatLetters}
             incorrectLetters={incorrectLetters[rowIndex]}
+            lettersWord={lettersWord}
           />
         ))}
       </div>
