@@ -23,7 +23,7 @@ export function Termo() {
   const strNormal = normalWord;
   const str = randomWord;
   const [isCorrect, setIsCorrect] = useState(
-    Array.from({ length: 7 }, () => null)
+    Array.from({ length: 6 }, () => null)
   );
   const [oneCorrect, setOneCorrect] = useState(false);
   const [strRepeatLetters, setStrRepeatLetters] = useState(false);
@@ -32,13 +32,13 @@ export function Termo() {
   const [activeBox, setActiveBox] = useState(0);
   const [actualEnabled, setActualEnabled] = useState(0);
   const [values, setValues] = useState(
-    Array.from({ length: 7 }, () => Array(letters).fill(""))
+    Array.from({ length: 6 }, () => Array(letters).fill(""))
   );
   const [usedRows, setUsedRows] = useState(new Set());
   const [matchedLetters, setMatchedLetters] = useState([]);
   const [matchedPositions, setMatchedPositions] = useState([]);
   const [incorrectLetters, setIncorrectLetters] = useState(
-    Array.from({ length: 7 }, () => [])
+    Array.from({ length: 6 }, () => [])
   );
   const inputRefs = useRef([]);
 
@@ -88,8 +88,9 @@ export function Termo() {
       return newIsCorrect;
     });
   };
+
   const handleSubmit = () => {
-    setActualEnabled((prev) => (prev + 1) % 7);
+    setActualEnabled((prev) => (prev + 1) % 6);
 
     const currentRowValues = values[actualEnabled] || [];
     const currentRowText = currentRowValues.join("").toLowerCase();
@@ -151,53 +152,54 @@ export function Termo() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 w-full bg-emerald-700">
-      <h1 className="uppercase text-4xl font-black text-gray-200 mb-6">
-        {str}
-      </h1>
-      <h1 className="uppercase text-4xl font-black text-gray-200 mb-6">
-        {strNormal}
-      </h1>
-      <div className="grid grid-cols-1 w-full justify-stretch">
-        {Array.from({ length: 7 }).map((_, rowIndex) => (
-          <InputBox
-            key={rowIndex}
-            rowIndex={rowIndex}
-            boxes={boxes}
-            values={values}
-            setValues={setValues}
-            inputRefs={inputRefs}
-            activeBox={activeBox}
-            setActiveBox={setActiveBox}
+    <div className="bg-emerald-700 flex flex-col w-screen h-screen">
+      {/* Container principal que garante a ocupação máxima */}
+      <div className="flex flex-col flex-grow w-full">
+        {/* Container para os input boxes */}
+        <div className="h-[70vh] flex flex-col flex-grow overflow-hidden p-3">
+          <div className="flex flex-col justify-center items-center gap-2 h-full overflow-auto">
+            {Array.from({ length: 6 }).map((_, rowIndex) => (
+              <InputBox
+                key={rowIndex}
+                rowIndex={rowIndex}
+                boxes={boxes}
+                values={values}
+                setValues={setValues}
+                inputRefs={inputRefs}
+                activeBox={activeBox}
+                setActiveBox={setActiveBox}
+                actualEnabled={actualEnabled}
+                usedRows={usedRows}
+                isCorrect={isCorrect[rowIndex]}
+                handleCorrectRow={handleCorrectRow}
+                oneCorrect={oneCorrect}
+                matchedPositions={matchedPositions}
+                str={str}
+                strNormal={strNormal}
+                strRepeatLetters={strRepeatLetters}
+                incorrectLetters={incorrectLetters[rowIndex]}
+                lettersWord={lettersWord}
+              />
+            ))}
+          </div>
+        </div>
+        {/* Container para o teclado */}
+        <div className="h-[30vh] w-full flex justify-center items-center">
+          <Keyboard
+            layout={extendedQwertyLayout}
+            handleBackspace={() => {
+              const inputBox = inputRefs.current[activeBox];
+              if (inputBox) {
+                inputBox.dispatchEvent(
+                  new KeyboardEvent("keydown", { key: "Backspace" })
+                );
+              }
+            }}
+            handleAlphabetClick={handleAlphabetClick}
+            handleSubmit={handleSubmit}
             actualEnabled={actualEnabled}
-            usedRows={usedRows}
-            isCorrect={isCorrect[rowIndex]}
-            handleCorrectRow={handleCorrectRow}
-            oneCorrect={oneCorrect}
-            matchedPositions={matchedPositions}
-            str={str}
-            strNormal={strNormal}
-            strRepeatLetters={strRepeatLetters}
-            incorrectLetters={incorrectLetters[rowIndex]}
-            lettersWord={lettersWord}
           />
-        ))}
-      </div>
-      <div className="text-xl mt-6 space-y-2 w-full">
-        <Keyboard
-          layout={extendedQwertyLayout}
-          handleBackspace={(row) => {
-            const inputBox = inputRefs.current[activeBox];
-            if (inputBox) {
-              inputBox.dispatchEvent(
-                new KeyboardEvent("keydown", { key: "Backspace" })
-              );
-            }
-          }}
-          handleAlphabetClick={handleAlphabetClick}
-          handleSubmit={handleSubmit}
-          actualEnabled={actualEnabled}
-        />
+        </div>
       </div>
     </div>
   );

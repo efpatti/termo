@@ -24,7 +24,6 @@ const InputBox = ({
   const [count, setCount] = useState(-1);
   const [isActive, setIsActive] = useState(false);
 
-  // Ref to keep track of interval
   const intervalRef = useRef(null);
 
   useEffect(() => {
@@ -146,7 +145,6 @@ const InputBox = ({
     setCurrentDisplay(values[rowIndex]);
   };
 
-  // Determine a cor do fundo com base na letra e sua posição
   const getBackgroundColor = (boxIndex) => {
     const currentLetter = values[rowIndex][boxIndex].toLowerCase();
     const correctPosition = matchedPositions.find(
@@ -156,7 +154,7 @@ const InputBox = ({
       return "bg-emerald-600";
     }
     if (correctPosition) {
-      return "ease-in-out duration-300 transition-all bg-green-500"; // letra correta na posição correta
+      return "bg-green-500"; // letra correta na posição correta
     } else if (matchedPositions.some((pos) => pos.letter === currentLetter)) {
       return "bg-yellow-300"; // letra correta na posição errada
     } else {
@@ -176,57 +174,50 @@ const InputBox = ({
     }
   }, [activeBox]);
 
-  // Cria uma lista de letras únicas baseada na string normalizada e no comprimento dos inputs
   const uniqueLettersWord = React.useMemo(() => {
-    // Remove letras duplicadas e retorna exatamente o número necessário de letras
     const uniqueLetters = [...new Set(strNormal.split(""))];
-    return uniqueLetters.slice(0, boxes.length); // Garante que tenha o número correto de letras
+    return uniqueLetters.slice(0, boxes.length);
   }, [strNormal, boxes.length]);
 
   return (
-    <div>
-      <div className="flex justify-center gap-1">
-        {boxes.map((box, index) => (
-          <React.Fragment key={index}>
-            <input
-              id={generateId(rowIndex, box)}
-              name={generateId(rowIndex, box)}
-              ref={(el) => (inputRefs.current[box] = el)}
-              type="text"
-              maxLength={1}
-              value={
-                count >= box && isCorrect
-                  ? uniqueLettersWord[index] || "" // Exibe a letra correspondente
-                  : currentDisplay[box] || ""
-              }
-              onChange={(event) => handleChange(box, event)}
-              onClick={() => setActiveBox(box)}
-              onKeyDown={handleKeyDown}
-              disabled={actualEnabled !== rowIndex || oneCorrect}
-              className={`text-4xl uppercase font-black border-black ${
-                isActiveRow
-                  ? "bg-emerald-600"
-                  : isUsedRow
-                  ? getBackgroundColor(box)
-                  : "bg-emerald-900 opacity-25 brightness-50"
-              } ${
-                oneCorrect &&
-                !isCorrect &&
-                isActiveRow &&
-                "bg-emerald-900 opacity-25 brightness-50"
-              } text-center w-16 h-16 text-white flex items-center justify-center rounded-lg mb-1 transition-transform duration-300 caret-transparent ease-in-out cursor-pointer ${
-                !oneCorrect && isActiveRow && activeBox === box
-                  ? "border-b-8"
-                  : ""
-              } outline-0 border-2 active:shadow-lg ${
-                count >= box &&
-                isCorrect &&
-                "ease-in-out duration-700 transition-all bg-green-500 transition"
-              }`}
-            />
-          </React.Fragment>
-        ))}
-      </div>
+    <div className="flex justify-center items-center gap-1 flex-wrap w-full">
+      {boxes.map((box, index) => (
+        <input
+          key={index}
+          id={generateId(rowIndex, box)}
+          name={generateId(rowIndex, box)}
+          ref={(el) => (inputRefs.current[box] = el)}
+          type="text"
+          maxLength={1}
+          value={
+            count >= box && isCorrect
+              ? uniqueLettersWord[index] || ""
+              : currentDisplay[box] || ""
+          }
+          onChange={(event) => handleChange(box, event)}
+          onClick={() => setActiveBox(box)}
+          onKeyDown={handleKeyDown}
+          disabled={actualEnabled !== rowIndex || oneCorrect}
+          className={`text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl uppercase font-black border-black ${
+            isActiveRow
+              ? "bg-emerald-600"
+              : isUsedRow
+              ? getBackgroundColor(box)
+              : "bg-emerald-900 opacity-25 brightness-50"
+          } ${
+            oneCorrect &&
+            !isCorrect &&
+            isActiveRow &&
+            "bg-emerald-900 opacity-25 brightness-50"
+          } text-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 flex items-center justify-center rounded-lg mb-1 transition-transform duration-300 caret-transparent ease-in-out cursor-pointer ${
+            !oneCorrect && isActiveRow && activeBox === box ? "border-b-8" : ""
+          } outline-0 border-2 active:shadow-lg ${
+            count >= box &&
+            isCorrect &&
+            "ease-in-out duration-700 transition-all bg-green-500 transition"
+          }`}
+        />
+      ))}
     </div>
   );
 };
