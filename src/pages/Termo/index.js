@@ -156,7 +156,7 @@ export function Termo() {
       {/* Container principal que garante a ocupação máxima */}
       <div className="flex flex-col flex-grow w-full">
         {/* Container para os input boxes */}
-        <div className="h-[70vh] flex flex-col flex-grow overflow-hidden p-3">
+        <div className="w-full h-[70vh] flex flex-col flex-grow overflow-hidden p-3">
           <div className="flex flex-col justify-center items-center gap-2 h-full overflow-auto">
             {Array.from({ length: 6 }).map((_, rowIndex) => (
               <InputBox

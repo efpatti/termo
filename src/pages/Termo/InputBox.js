@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 const InputBox = ({
   rowIndex,
@@ -180,7 +180,7 @@ const InputBox = ({
   }, [strNormal, boxes.length]);
 
   return (
-    <div className="flex justify-center items-center gap-1 flex-wrap w-full">
+    <div className="flex justify-center items-center w-full md:w-2/3 h-full space-x-1 md:space-x-2">
       {boxes.map((box, index) => (
         <input
           key={index}
@@ -198,7 +198,7 @@ const InputBox = ({
           onClick={() => setActiveBox(box)}
           onKeyDown={handleKeyDown}
           disabled={actualEnabled !== rowIndex || oneCorrect}
-          className={`text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl uppercase font-black border-black ${
+          className={`w-[15%] md:w-[15%] lg:w-[8%] lg:h-[95%] md:h-[100%] h-full text-lg uppercase font-bold border-2 border-black ${
             isActiveRow
               ? "bg-emerald-600"
               : isUsedRow
@@ -209,12 +209,12 @@ const InputBox = ({
             !isCorrect &&
             isActiveRow &&
             "bg-emerald-900 opacity-25 brightness-50"
-          } text-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 flex items-center justify-center rounded-lg mb-1 transition-transform duration-300 caret-transparent ease-in-out cursor-pointer ${
+          } text-center flex items-center justify-center rounded-lg transition-transform duration-300 caret-transparent cursor-pointer ${
             !oneCorrect && isActiveRow && activeBox === box ? "border-b-8" : ""
-          } outline-0 border-2 active:shadow-lg ${
+          } outline-0 active:shadow-lg ${
             count >= box &&
             isCorrect &&
-            "ease-in-out duration-700 transition-all bg-green-500 transition"
+            "bg-green-500 transition-all duration-700 ease-in-out"
           }`}
         />
       ))}
